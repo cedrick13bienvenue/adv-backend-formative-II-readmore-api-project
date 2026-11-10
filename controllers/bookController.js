@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+const Author = require('../models/Author');
 const Book = require('../models/Book');
 const pick = require('../utils/pick');
 const validateBook = require('../utils/validateBook');
@@ -9,11 +11,19 @@ const reject = (res, status, message) => res.status(status).json({ message });
 
 const bookNotFound = (res, id) => reject(res, 404, `No book found with id ${id}`);
 
+const unknownAuthor = (res, id) =>
+  reject(res, 400, `Author ${id} does not exist. A book must belong to an existing author.`);
+
+const authorExists = async (id) =>
+  mongoose.isObjectIdOrHexString(id) && Boolean(await Author.exists({ _id: id }));
+
 const createBook = async (req, res) => {
   const data = pick(req.body, BOOK_FIELDS);
 
   const problem = validateBook(data);
   if (problem) return reject(res, problem.status, problem.message);
+
+  if (!(await authorExists(data.author))) return unknownAuthor(res, data.author);
 
   const book = await Book.create(data);
   await book.populate('author', AUTHOR_DETAILS);
@@ -40,6 +50,10 @@ const updateBook = async (req, res) => {
 
   const problem = validateBook(changes, { partial: true });
   if (problem) return reject(res, problem.status, problem.message);
+
+  if (changes.author !== undefined && !(await authorExists(changes.author))) {
+    return unknownAuthor(res, changes.author);
+  }
 
   book.set(changes);
   await book.save();
