@@ -58,6 +58,33 @@ const getAuthorBooks = async (req, res) => {
   res.json({ author, count: books.length, books });
 };
 
+const getAuthorStats = async (req, res) => {
+  const author = await Author.findById(req.params.id);
+  if (!author) return authorNotFound(res, req.params.id);
+
+  const [stats] = await Book.aggregate([
+    { $match: { author: author._id } },
+    { $sort: { price: 1, title: 1 } },
+    {
+      $group: {
+        _id: null,
+        bookCount: { $sum: 1 },
+        averagePrice: { $avg: '$price' },
+        cheapestBook: { $first: '$title' },
+        mostExpensiveBook: { $last: '$title' },
+      },
+    },
+  ]);
+
+  res.json({
+    author: author.name,
+    bookCount: stats?.bookCount ?? 0,
+    averagePrice: stats ? Math.round(stats.averagePrice * 100) / 100 : null,
+    cheapestBook: stats?.cheapestBook ?? null,
+    mostExpensiveBook: stats?.mostExpensiveBook ?? null,
+  });
+};
+
 module.exports = {
   createAuthor,
   getAuthors,
@@ -65,4 +92,5 @@ module.exports = {
   updateAuthor,
   deleteAuthor,
   getAuthorBooks,
+  getAuthorStats,
 };
