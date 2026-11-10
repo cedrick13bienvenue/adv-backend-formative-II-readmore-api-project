@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const authorRoutes = require('./routes/authorRoutes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -13,6 +14,8 @@ app.get('/', (req, res) => {
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
   });
 });
+
+app.use('/authors', authorRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
