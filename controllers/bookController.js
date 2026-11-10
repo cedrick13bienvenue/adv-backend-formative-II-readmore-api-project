@@ -44,11 +44,12 @@ const createBook = async (req, res) => {
 };
 
 const getBooks = async (req, res) => {
-  const { filter, error } = buildBookQuery(req.query);
+  const { filter, sortBy, error } = buildBookQuery(req.query);
   if (error) return reject(res, 400, error);
 
   const books = await Book.find(filter)
     .collation(CASE_INSENSITIVE)
+    .sort(sortBy)
     .populate('author', AUTHOR_DETAILS);
   res.json(books);
 };

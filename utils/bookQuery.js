@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+const SORTABLE_FIELDS = ['price', 'title', 'publishedYear'];
+const SORT_ORDERS = ['asc', 'desc'];
+
 const lastValue = (value) => (Array.isArray(value) ? value.at(-1) : value);
 
 const toNumber = (value) => (value === undefined || value === '' ? undefined : Number(value));
@@ -37,7 +40,16 @@ const buildBookQuery = (rawQuery) => {
     if (maxPrice !== undefined) filter.price.$lte = maxPrice;
   }
 
-  return { filter };
+  if (query.sort && !SORTABLE_FIELDS.includes(query.sort)) {
+    return { error: `sort must be one of: ${SORTABLE_FIELDS.join(', ')}` };
+  }
+  const order = (query.order ?? 'asc').toLowerCase();
+  if (!SORT_ORDERS.includes(order)) {
+    return { error: 'order must be asc or desc' };
+  }
+  const sortBy = query.sort ? { [query.sort]: order === 'asc' ? 1 : -1, _id: 1 } : { _id: 1 };
+
+  return { filter, sortBy };
 };
 
 module.exports = buildBookQuery;
