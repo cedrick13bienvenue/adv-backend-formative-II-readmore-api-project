@@ -35,9 +35,18 @@ const updateAuthor = async (req, res) => {
 };
 
 const deleteAuthor = async (req, res) => {
-  const author = await Author.findByIdAndDelete(req.params.id);
+  const author = await Author.findById(req.params.id);
   if (!author) return authorNotFound(res, req.params.id);
 
+  const bookCount = await Book.countDocuments({ author: author._id });
+  if (bookCount > 0) {
+    return res.status(409).json({
+      message: `Cannot delete "${author.name}": they still have ${bookCount} book(s). Delete or reassign those books first.`,
+      bookCount,
+    });
+  }
+
+  await author.deleteOne();
   res.json({ message: `Author "${author.name}" deleted`, author });
 };
 
