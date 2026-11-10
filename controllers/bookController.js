@@ -35,4 +35,11 @@ const updateBook = async (req, res) => {
   res.json(book);
 };
 
-module.exports = { createBook, getBooks, getBookById, updateBook };
+const deleteBook = async (req, res) => {
+  const book = await Book.findByIdAndDelete(req.params.id);
+  if (!book) return bookNotFound(res, req.params.id);
+
+  res.json({ message: `Book "${book.title}" deleted`, book });
+};
+
+module.exports = { createBook, getBooks, getBookById, updateBook, deleteBook };
