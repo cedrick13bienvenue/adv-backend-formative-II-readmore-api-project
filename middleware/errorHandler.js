@@ -12,6 +12,13 @@ const errorHandler = (err, req, res, _next) => {
     return res.status(400).json({ message: 'Validation failed', errors });
   }
 
+  if (err.code === 11000) {
+    return res.status(409).json({
+      message: 'Duplicate entry: this author already has a book with that title',
+      duplicate: err.keyValue,
+    });
+  }
+
   if (err.name === 'CastError') {
     return res.status(400).json({ message: `Invalid value for ${err.path}: ${JSON.stringify(err.value)}` });
   }

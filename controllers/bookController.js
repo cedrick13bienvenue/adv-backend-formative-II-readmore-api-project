@@ -3,6 +3,7 @@ const Author = require('../models/Author');
 const Book = require('../models/Book');
 const pick = require('../utils/pick');
 const validateBook = require('../utils/validateBook');
+const { CASE_INSENSITIVE } = require('../utils/collation');
 
 const BOOK_FIELDS = ['title', 'genre', 'price', 'publishedYear', 'author'];
 const AUTHOR_DETAILS = 'name country bio';
@@ -17,6 +18,15 @@ const unknownAuthor = (res, id) =>
 const authorExists = async (id) =>
   mongoose.isObjectIdOrHexString(id) && Boolean(await Author.exists({ _id: id }));
 
+const duplicateTitle = (res, title) =>
+  reject(res, 409, `This author already has a book titled "${title.trim()}"`);
+
+const titleTakenByAuthor = (authorId, title, ignoreBookId) => {
+  const filter = { author: authorId, title: title.trim() };
+  if (ignoreBookId) filter._id = { $ne: ignoreBookId };
+  return Book.exists(filter).collation(CASE_INSENSITIVE);
+};
+
 const createBook = async (req, res) => {
   const data = pick(req.body, BOOK_FIELDS);
 
@@ -24,6 +34,8 @@ const createBook = async (req, res) => {
   if (problem) return reject(res, problem.status, problem.message);
 
   if (!(await authorExists(data.author))) return unknownAuthor(res, data.author);
+
+  if (await titleTakenByAuthor(data.author, data.title)) return duplicateTitle(res, data.title);
 
   const book = await Book.create(data);
   await book.populate('author', AUTHOR_DETAILS);
@@ -54,6 +66,10 @@ const updateBook = async (req, res) => {
   if (changes.author !== undefined && !(await authorExists(changes.author))) {
     return unknownAuthor(res, changes.author);
   }
+
+  const authorId = changes.author ?? book.author;
+  const title = changes.title ?? book.title;
+  if (await titleTakenByAuthor(authorId, title, book._id)) return duplicateTitle(res, title);
 
   book.set(changes);
   await book.save();

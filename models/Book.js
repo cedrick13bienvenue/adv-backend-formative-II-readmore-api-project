@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { CASE_INSENSITIVE } = require('../utils/collation');
 
 const bookSchema = new mongoose.Schema(
   {
@@ -28,5 +29,7 @@ const bookSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+bookSchema.index({ author: 1, title: 1 }, { unique: true, collation: CASE_INSENSITIVE });
 
 module.exports = mongoose.model('Book', bookSchema);
