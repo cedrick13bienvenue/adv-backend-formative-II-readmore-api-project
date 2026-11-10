@@ -3,6 +3,7 @@ const Author = require('../models/Author');
 const Book = require('../models/Book');
 const pick = require('../utils/pick');
 const validateBook = require('../utils/validateBook');
+const buildBookQuery = require('../utils/bookQuery');
 const { CASE_INSENSITIVE } = require('../utils/collation');
 
 const BOOK_FIELDS = ['title', 'genre', 'price', 'publishedYear', 'author'];
@@ -43,7 +44,12 @@ const createBook = async (req, res) => {
 };
 
 const getBooks = async (req, res) => {
-  const books = await Book.find().populate('author', AUTHOR_DETAILS);
+  const { filter, error } = buildBookQuery(req.query);
+  if (error) return reject(res, 400, error);
+
+  const books = await Book.find(filter)
+    .collation(CASE_INSENSITIVE)
+    .populate('author', AUTHOR_DETAILS);
   res.json(books);
 };
 
