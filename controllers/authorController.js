@@ -3,6 +3,9 @@ const pick = require('../utils/pick');
 
 const AUTHOR_FIELDS = ['name', 'country', 'bio'];
 
+const authorNotFound = (res, id) =>
+  res.status(404).json({ message: `No author found with id ${id}` });
+
 const createAuthor = async (req, res) => {
   const author = await Author.create(pick(req.body, AUTHOR_FIELDS));
   res.status(201).json(author);
@@ -13,4 +16,11 @@ const getAuthors = async (req, res) => {
   res.json(authors);
 };
 
-module.exports = { createAuthor, getAuthors };
+const getAuthorById = async (req, res) => {
+  const author = await Author.findById(req.params.id);
+  if (!author) return authorNotFound(res, req.params.id);
+
+  res.json(author);
+};
+
+module.exports = { createAuthor, getAuthors, getAuthorById };
