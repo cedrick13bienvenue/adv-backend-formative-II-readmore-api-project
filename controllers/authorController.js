@@ -8,4 +8,9 @@ const createAuthor = async (req, res) => {
   res.status(201).json(author);
 };
 
-module.exports = { createAuthor };
+const getAuthors = async (req, res) => {
+  const authors = await Author.find().sort({ name: 1 });
+  res.json(authors);
+};
+
+module.exports = { createAuthor, getAuthors };
