@@ -23,4 +23,14 @@ const getAuthorById = async (req, res) => {
   res.json(author);
 };
 
-module.exports = { createAuthor, getAuthors, getAuthorById };
+const updateAuthor = async (req, res) => {
+  const author = await Author.findByIdAndUpdate(req.params.id, pick(req.body, AUTHOR_FIELDS), {
+    returnDocument: 'after',
+    runValidators: true,
+  });
+  if (!author) return authorNotFound(res, req.params.id);
+
+  res.json(author);
+};
+
+module.exports = { createAuthor, getAuthors, getAuthorById, updateAuthor };
