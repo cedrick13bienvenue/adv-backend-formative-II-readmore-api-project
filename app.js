@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const authorRoutes = require('./routes/authorRoutes');
+const bookRoutes = require('./routes/bookRoutes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -16,6 +17,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/authors', authorRoutes);
+app.use('/books', bookRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
