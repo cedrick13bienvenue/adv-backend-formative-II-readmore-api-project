@@ -1,0 +1,273 @@
+# ReadMore API demo requests
+# Open in VS Code with the "REST Client" extension and click "Send Request" above each one.
+# Run `npm run seed` first, then send the requests from top to bottom.
+
+@baseUrl = http://localhost:3000
+@missingId = 000000000000000000000000
+
+### Health check
+GET {{baseUrl}}/
+
+
+############################################################
+# Part 2: Author endpoints
+############################################################
+
+### 1. Create an author
+# @name createAuthor
+POST {{baseUrl}}/authors
+Content-Type: application/json
+
+{
+  "name": "Amara Okafor",
+  "country": "Nigeria",
+  "bio": "Thriller writer from Lagos"
+}
+
+###
+
+@authorId = {{createAuthor.response.body.$._id}}
+
+### Create an author without a name (400)
+POST {{baseUrl}}/authors
+Content-Type: application/json
+
+{
+  "country": "Ghana"
+}
+
+### 2. Get all authors
+GET {{baseUrl}}/authors
+
+### 3. Get one author
+GET {{baseUrl}}/authors/{{authorId}}
+
+### Get an author that does not exist (404)
+GET {{baseUrl}}/authors/{{missingId}}
+
+### Get an author with a malformed id (400)
+GET {{baseUrl}}/authors/not-an-id
+
+### 4. Update an author
+PUT {{baseUrl}}/authors/{{authorId}}
+Content-Type: application/json
+
+{
+  "bio": "Award-winning thriller writer from Lagos"
+}
+
+### Update an author that does not exist (404)
+PUT {{baseUrl}}/authors/{{missingId}}
+Content-Type: application/json
+
+{
+  "bio": "Nobody"
+}
+
+
+############################################################
+# Part 3: Book endpoints
+############################################################
+
+### 1. Create a book for an author
+# @name createBook
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "title": "The Silent Sea",
+  "genre": "Thriller",
+  "price": 24.99,
+  "publishedYear": 2021,
+  "author": "{{authorId}}"
+}
+
+###
+
+@bookId = {{createBook.response.body.$._id}}
+
+### 2. Get all books (author details are populated)
+GET {{baseUrl}}/books
+
+### 3. Get one book (author details are populated)
+GET {{baseUrl}}/books/{{bookId}}
+
+### Get a book that does not exist (404)
+GET {{baseUrl}}/books/{{missingId}}
+
+### 4. Update a book
+PUT {{baseUrl}}/books/{{bookId}}
+Content-Type: application/json
+
+{
+  "price": 22.5
+}
+
+### Linking endpoint: all books by one author
+GET {{baseUrl}}/authors/{{authorId}}/books
+
+
+############################################################
+# Part 4: Business rules
+############################################################
+
+### Rule 1: book for an author id that does not exist (400)
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "title": "Ghost Story",
+  "genre": "Horror",
+  "price": 10,
+  "publishedYear": 2020,
+  "author": "{{missingId}}"
+}
+
+### Rule 2: same title, same author, different case (409)
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "title": "the silent sea",
+  "genre": "Thriller",
+  "price": 19,
+  "publishedYear": 2022,
+  "author": "{{authorId}}"
+}
+
+### Rule 2: same title, different author is allowed (201)
+# Toni Morrison and Marilynne Robinson already each have a book called "Home".
+# @name createHome
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "title": "Home",
+  "genre": "Thriller",
+  "price": 18,
+  "publishedYear": 2023,
+  "author": "{{authorId}}"
+}
+
+###
+
+@homeBookId = {{createHome.response.body.$._id}}
+
+### Rule 3: price of zero (422)
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "title": "Free Book",
+  "genre": "Fiction",
+  "price": 0,
+  "publishedYear": 2020,
+  "author": "{{authorId}}"
+}
+
+### Rule 3: negative price on update (422)
+PUT {{baseUrl}}/books/{{bookId}}
+Content-Type: application/json
+
+{
+  "price": -5
+}
+
+### Rule 3: published in the future (422)
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "title": "Tomorrow's News",
+  "genre": "Fiction",
+  "price": 12,
+  "publishedYear": 2099,
+  "author": "{{authorId}}"
+}
+
+### Rule 3: published before 1450 (422)
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "title": "Before the Printing Press",
+  "genre": "History",
+  "price": 12,
+  "publishedYear": 1200,
+  "author": "{{authorId}}"
+}
+
+### Rule 5: no filters returns every book
+GET {{baseUrl}}/books
+
+### Rule 5: one filter
+GET {{baseUrl}}/books?genre=Thriller
+
+### Rule 5: price range
+GET {{baseUrl}}/books?minPrice=15&maxPrice=20
+
+### Rule 5: several filters combined with sorting
+GET {{baseUrl}}/books?genre=Fiction&minPrice=15&maxPrice=25&sort=price&order=desc
+
+### Rule 5: search by title
+GET {{baseUrl}}/books?search=home&sort=publishedYear
+
+### Rule 5: filter by author
+GET {{baseUrl}}/books?author={{authorId}}
+
+### Rule 5: invalid sort field (400)
+GET {{baseUrl}}/books?sort=author
+
+### Challenge: pagination, page 1 of 3
+GET {{baseUrl}}/books?sort=title&limit=7&page=1
+
+### Challenge: pagination, page 2 of 3
+GET {{baseUrl}}/books?sort=title&limit=7&page=2
+
+### Rule 6: find Chinua Achebe's id through the search filter
+# @name achebe
+GET {{baseUrl}}/books?search=things%20fall%20apart
+
+###
+
+@achebeId = {{achebe.response.body.$.results[0].author._id}}
+
+### Rule 6: stats for an author with books
+GET {{baseUrl}}/authors/{{achebeId}}/stats
+
+### Rule 6: stats for an author with no books
+# @name newAuthor
+POST {{baseUrl}}/authors
+Content-Type: application/json
+
+{
+  "name": "Brand New Author"
+}
+
+###
+
+@newAuthorId = {{newAuthor.response.body.$._id}}
+
+###
+GET {{baseUrl}}/authors/{{newAuthorId}}/stats
+
+### Rule 4: delete an author who still has 2 books (409, blocked)
+DELETE {{baseUrl}}/authors/{{authorId}}
+
+### Rule 4: remove one of their books
+DELETE {{baseUrl}}/books/{{homeBookId}}
+
+### Rule 4: still blocked, 1 book left (409)
+DELETE {{baseUrl}}/authors/{{authorId}}
+
+### Rule 4: remove their last book
+DELETE {{baseUrl}}/books/{{bookId}}
+
+### Rule 4: no books left, delete succeeds (200)
+DELETE {{baseUrl}}/authors/{{authorId}}
+
+### Deleted author is gone (404)
+GET {{baseUrl}}/authors/{{authorId}}
+
+### Deleted book is gone (404)
+DELETE {{baseUrl}}/books/{{bookId}}
