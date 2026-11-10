@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -12,5 +13,8 @@ app.get('/', (req, res) => {
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
   });
 });
+
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;
