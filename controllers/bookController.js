@@ -1,14 +1,21 @@
 const Book = require('../models/Book');
 const pick = require('../utils/pick');
+const validateBook = require('../utils/validateBook');
 
 const BOOK_FIELDS = ['title', 'genre', 'price', 'publishedYear', 'author'];
 const AUTHOR_DETAILS = 'name country bio';
 
-const bookNotFound = (res, id) =>
-  res.status(404).json({ message: `No book found with id ${id}` });
+const reject = (res, status, message) => res.status(status).json({ message });
+
+const bookNotFound = (res, id) => reject(res, 404, `No book found with id ${id}`);
 
 const createBook = async (req, res) => {
-  const book = await Book.create(pick(req.body, BOOK_FIELDS));
+  const data = pick(req.body, BOOK_FIELDS);
+
+  const problem = validateBook(data);
+  if (problem) return reject(res, problem.status, problem.message);
+
+  const book = await Book.create(data);
   await book.populate('author', AUTHOR_DETAILS);
   res.status(201).json(book);
 };
@@ -29,7 +36,12 @@ const updateBook = async (req, res) => {
   const book = await Book.findById(req.params.id);
   if (!book) return bookNotFound(res, req.params.id);
 
-  book.set(pick(req.body, BOOK_FIELDS));
+  const changes = pick(req.body, BOOK_FIELDS);
+
+  const problem = validateBook(changes, { partial: true });
+  if (problem) return reject(res, problem.status, problem.message);
+
+  book.set(changes);
   await book.save();
   await book.populate('author', AUTHOR_DETAILS);
   res.json(book);
