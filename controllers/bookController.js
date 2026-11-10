@@ -44,14 +44,27 @@ const createBook = async (req, res) => {
 };
 
 const getBooks = async (req, res) => {
-  const { filter, sortBy, error } = buildBookQuery(req.query);
+  const { filter, sortBy, page, limit, error } = buildBookQuery(req.query);
   if (error) return reject(res, 400, error);
 
-  const books = await Book.find(filter)
+  const findBooks = Book.find(filter)
     .collation(CASE_INSENSITIVE)
     .sort(sortBy)
     .populate('author', AUTHOR_DETAILS);
-  res.json(books);
+  if (limit) findBooks.skip((page - 1) * limit).limit(limit);
+
+  const [results, total] = await Promise.all([
+    findBooks,
+    Book.countDocuments(filter).collation(CASE_INSENSITIVE),
+  ]);
+
+  res.json({
+    page,
+    limit: limit ?? null,
+    total,
+    totalPages: limit ? Math.ceil(total / limit) : Number(total > 0),
+    results,
+  });
 };
 
 const getBookById = async (req, res) => {

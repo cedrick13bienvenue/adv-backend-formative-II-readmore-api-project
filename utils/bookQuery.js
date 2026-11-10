@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const SORTABLE_FIELDS = ['price', 'title', 'publishedYear'];
 const SORT_ORDERS = ['asc', 'desc'];
+const DEFAULT_LIMIT = 10;
+const MAX_LIMIT = 100;
 
 const lastValue = (value) => (Array.isArray(value) ? value.at(-1) : value);
 
@@ -49,7 +51,16 @@ const buildBookQuery = (rawQuery) => {
   }
   const sortBy = query.sort ? { [query.sort]: order === 'asc' ? 1 : -1, _id: 1 } : { _id: 1 };
 
-  return { filter, sortBy };
+  const page = toNumber(query.page) ?? 1;
+  const limit = toNumber(query.limit) ?? (query.page === undefined ? undefined : DEFAULT_LIMIT);
+  if (!Number.isInteger(page) || page < 1) {
+    return { error: 'page must be a whole number of 1 or more' };
+  }
+  if (limit !== undefined && (!Number.isInteger(limit) || limit < 1 || limit > MAX_LIMIT)) {
+    return { error: `limit must be a whole number from 1 to ${MAX_LIMIT}` };
+  }
+
+  return { filter, sortBy, page, limit };
 };
 
 module.exports = buildBookQuery;
