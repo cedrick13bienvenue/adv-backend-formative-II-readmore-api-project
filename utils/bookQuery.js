@@ -1,6 +1,10 @@
+const mongoose = require('mongoose');
+
 const lastValue = (value) => (Array.isArray(value) ? value.at(-1) : value);
 
 const toNumber = (value) => (value === undefined || value === '' ? undefined : Number(value));
+
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const buildBookQuery = (rawQuery) => {
   const query = Object.fromEntries(
@@ -9,6 +13,15 @@ const buildBookQuery = (rawQuery) => {
   const filter = {};
 
   if (query.genre) filter.genre = query.genre;
+
+  if (query.author) {
+    if (!mongoose.isObjectIdOrHexString(query.author)) {
+      return { error: `author must be a valid author id (received "${query.author}")` };
+    }
+    filter.author = query.author;
+  }
+
+  if (query.search) filter.title = { $regex: escapeRegex(query.search), $options: 'i' };
 
   const minPrice = toNumber(query.minPrice);
   const maxPrice = toNumber(query.maxPrice);
