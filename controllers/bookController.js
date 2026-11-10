@@ -10,4 +10,9 @@ const createBook = async (req, res) => {
   res.status(201).json(book);
 };
 
-module.exports = { createBook };
+const getBooks = async (req, res) => {
+  const books = await Book.find().populate('author', AUTHOR_DETAILS);
+  res.json(books);
+};
+
+module.exports = { createBook, getBooks };
