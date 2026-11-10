@@ -25,4 +25,14 @@ const getBookById = async (req, res) => {
   res.json(book);
 };
 
-module.exports = { createBook, getBooks, getBookById };
+const updateBook = async (req, res) => {
+  const book = await Book.findById(req.params.id);
+  if (!book) return bookNotFound(res, req.params.id);
+
+  book.set(pick(req.body, BOOK_FIELDS));
+  await book.save();
+  await book.populate('author', AUTHOR_DETAILS);
+  res.json(book);
+};
+
+module.exports = { createBook, getBooks, getBookById, updateBook };
