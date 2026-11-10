@@ -33,4 +33,11 @@ const updateAuthor = async (req, res) => {
   res.json(author);
 };
 
-module.exports = { createAuthor, getAuthors, getAuthorById, updateAuthor };
+const deleteAuthor = async (req, res) => {
+  const author = await Author.findByIdAndDelete(req.params.id);
+  if (!author) return authorNotFound(res, req.params.id);
+
+  res.json({ message: `Author "${author.name}" deleted`, author });
+};
+
+module.exports = { createAuthor, getAuthors, getAuthorById, updateAuthor, deleteAuthor };
