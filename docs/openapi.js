@@ -54,10 +54,7 @@ module.exports = {
   info: {
     title: 'ReadMore API',
     version: '1.0.0',
-    description:
-      'Bookstore API for linked authors and books, built with Express, MongoDB and Mongoose.\n\n' +
-      'Run `npm run seed` for sample data, then use **GET /authors** to copy an author id. ' +
-      'Requests with a body offer several examples in the **Examples** dropdown, including ones that break each business rule.',
+    description: 'Bookstore API for linked authors and books, built with Express, MongoDB and Mongoose.',
   },
   servers: [{ url: '/', description: 'This server' }],
   tags: [
