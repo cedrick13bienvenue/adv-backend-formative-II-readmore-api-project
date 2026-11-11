@@ -3,7 +3,7 @@
 A bookstore REST API built with **Express.js**, **MongoDB** and **Mongoose**. Authors and books are linked
 (one author has many books), and the controllers enforce the store's business rules.
 
-**Video walkthrough:** [`video/readmore-walkthrough.mp4`](video/readmore-walkthrough.mp4)
+**Video walkthrough:** https://youtu.be/5H2y8WKx0cg
 
 ## Getting started
 
