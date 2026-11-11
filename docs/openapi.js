@@ -20,19 +20,19 @@ const queryParam = (name, description, schema) => ({ name, in: 'query', required
 
 const exampleAuthor = {
   _id: '6af39bd29abecae113637841',
-  name: 'Chinua Achebe',
-  country: 'Nigeria',
-  bio: 'Novelist and critic, author of the African Trilogy.',
+  name: 'Robert Greene',
+  country: 'USA',
+  bio: 'Author of books on strategy, power and human nature.',
   createdAt: '2026-11-10T22:30:25.883Z',
   updatedAt: '2026-11-10T22:30:25.883Z',
 };
 
 const exampleBook = {
   _id: '6af39bd29abecae113637850',
-  title: 'Things Fall Apart',
-  genre: 'Fiction',
-  price: 15,
-  publishedYear: 1958,
+  title: 'The 48 Laws of Power',
+  genre: 'Self-Help',
+  price: 18,
+  publishedYear: 1998,
   author: { _id: exampleAuthor._id, name: exampleAuthor.name, country: exampleAuthor.country, bio: exampleAuthor.bio },
   createdAt: '2026-11-10T22:30:25.990Z',
   updatedAt: '2026-11-10T22:30:25.990Z',
@@ -149,7 +149,7 @@ module.exports = {
           409: {
             description: 'The author still has books',
             content: jsonContent(ref('Error'), {
-              message: 'Cannot delete "Chinua Achebe": they still have 4 book(s). Delete or reassign those books first.',
+              message: 'Cannot delete "Robert Greene": they still have 4 book(s). Delete or reassign those books first.',
               bookCount: 4,
             }),
           },
@@ -184,17 +184,17 @@ module.exports = {
                   withBooks: {
                     summary: 'Author with books',
                     value: {
-                      author: 'Chinua Achebe',
+                      author: 'Robert Greene',
                       bookCount: 4,
-                      averagePrice: 21.5,
-                      cheapestBook: 'Things Fall Apart',
-                      mostExpensiveBook: 'Anthills of the Savannah',
+                      averagePrice: 21,
+                      cheapestBook: 'The 48 Laws of Power',
+                      mostExpensiveBook: 'The Laws of Human Nature',
                     },
                   },
                   noBooks: {
                     summary: 'Author with no books',
                     value: {
-                      author: 'Scholastique Mukasonga',
+                      author: 'Ryan Holiday',
                       bookCount: 0,
                       averagePrice: null,
                       cheapestBook: null,
@@ -214,10 +214,6 @@ module.exports = {
       post: {
         tags: ['Books'],
         summary: 'Create a book for an existing author',
-        description:
-          'Replace PASTE_AN_AUTHOR_ID with an id from GET /authors. Checks run in this order: ' +
-          'missing or wrongly typed fields (400), price and year rules (422), author exists (400), ' +
-          'title not already used by that author, ignoring case (409).',
         requestBody: {
           required: true,
           content: {
@@ -317,7 +313,7 @@ module.exports = {
           200: ok('Updated book, with the author populated', ref('Book'), exampleBook),
           400: fail('Malformed id, wrongly typed field or unknown author', 'price must be a number'),
           404: fail('No book with that id', 'No book found with id 000000000000000000000000'),
-          409: fail('The author already has a book with this title', 'This author already has a book titled "Home"'),
+          409: fail('The author already has a book with this title', 'This author already has a book titled "Mastery"'),
           422: fail('Price or published year out of range', 'price must be greater than 0 (received -5)'),
         },
       },
@@ -388,7 +384,7 @@ module.exports = {
           genre: { type: 'string' },
           price: { type: 'number', description: 'Must be greater than 0' },
           publishedYear: { type: 'integer', description: 'From 1450 to the current year' },
-          author: { type: 'string', description: 'Id of an existing author' },
+          author: { type: 'string', description: 'The _id of the author who wrote this book (copy it from GET /authors)' },
         },
       },
       BookUpdate: {

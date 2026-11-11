@@ -136,14 +136,14 @@ Content-Type: application/json
 }
 
 ### Rule 2: same title, different author is allowed (201)
-# Toni Morrison and Marilynne Robinson already each have a book called "Home".
-# @name createHome
+# Robert Greene and George Leonard already each have a book called "Mastery".
+# @name createMastery
 POST {{baseUrl}}/books
 Content-Type: application/json
 
 {
-  "title": "Home",
-  "genre": "Thriller",
+  "title": "Mastery",
+  "genre": "Self-Help",
   "price": 18,
   "publishedYear": 2023,
   "author": "{{authorId}}"
@@ -151,7 +151,7 @@ Content-Type: application/json
 
 ###
 
-@homeBookId = {{createHome.response.body.$._id}}
+@masteryBookId = {{createMastery.response.body.$._id}}
 
 ### Rule 3: price of zero (422)
 POST {{baseUrl}}/books
@@ -201,16 +201,16 @@ Content-Type: application/json
 GET {{baseUrl}}/books
 
 ### Rule 5: one filter
-GET {{baseUrl}}/books?genre=Thriller
+GET {{baseUrl}}/books?genre=Technology
 
 ### Rule 5: price range
 GET {{baseUrl}}/books?minPrice=15&maxPrice=20
 
 ### Rule 5: several filters combined with sorting
-GET {{baseUrl}}/books?genre=Fiction&minPrice=15&maxPrice=25&sort=price&order=desc
+GET {{baseUrl}}/books?genre=Self-Help&minPrice=15&maxPrice=25&sort=price&order=desc
 
 ### Rule 5: search by title
-GET {{baseUrl}}/books?search=home&sort=publishedYear
+GET {{baseUrl}}/books?search=mastery&sort=publishedYear
 
 ### Rule 5: filter by author
 GET {{baseUrl}}/books?author={{authorId}}
@@ -224,16 +224,16 @@ GET {{baseUrl}}/books?sort=title&limit=7&page=1
 ### Challenge: pagination, page 2 of 3
 GET {{baseUrl}}/books?sort=title&limit=7&page=2
 
-### Rule 6: find Chinua Achebe's id through the search filter
-# @name achebe
-GET {{baseUrl}}/books?search=things%20fall%20apart
+### Rule 6: find Robert Greene's id through the search filter
+# @name greene
+GET {{baseUrl}}/books?search=48%20laws
 
 ###
 
-@achebeId = {{achebe.response.body.$.results[0].author._id}}
+@greeneId = {{greene.response.body.$.results[0].author._id}}
 
 ### Rule 6: stats for an author with books
-GET {{baseUrl}}/authors/{{achebeId}}/stats
+GET {{baseUrl}}/authors/{{greeneId}}/stats
 
 ### Rule 6: stats for an author with no books
 # @name newAuthor
@@ -255,7 +255,7 @@ GET {{baseUrl}}/authors/{{newAuthorId}}/stats
 DELETE {{baseUrl}}/authors/{{authorId}}
 
 ### Rule 4: remove one of their books
-DELETE {{baseUrl}}/books/{{homeBookId}}
+DELETE {{baseUrl}}/books/{{masteryBookId}}
 
 ### Rule 4: still blocked, 1 book left (409)
 DELETE {{baseUrl}}/authors/{{authorId}}
