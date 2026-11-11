@@ -10,7 +10,6 @@ const app = express();
 
 const swaggerUiOptions = {
   swaggerOptions: {
-    tryItOutEnabled: true,
     docExpansion: 'list',
     defaultModelsExpandDepth: -1,
     filter: true,
