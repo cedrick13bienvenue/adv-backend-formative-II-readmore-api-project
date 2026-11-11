@@ -5,44 +5,47 @@ const Author = require('./models/Author');
 const Book = require('./models/Book');
 
 const authors = [
-  { name: 'Chinua Achebe', country: 'Nigeria', bio: 'Novelist and critic, author of the African Trilogy.' },
-  { name: 'Chimamanda Ngozi Adichie', country: 'Nigeria', bio: 'Novelist and essayist.' },
-  { name: "Ngũgĩ wa Thiong'o", country: 'Kenya', bio: 'Novelist, playwright and essayist.' },
-  { name: 'Toni Morrison', country: 'USA', bio: 'Nobel Prize-winning novelist.' },
-  { name: 'Marilynne Robinson', country: 'USA', bio: 'Pulitzer Prize-winning novelist.' },
-  { name: 'Gillian Flynn', country: 'USA', bio: 'Thriller writer.' },
-  { name: 'Stieg Larsson', country: 'Sweden', bio: 'Journalist and crime novelist.' },
-  { name: 'Scholastique Mukasonga', country: 'Rwanda', bio: 'Writer with no titles in stock yet.' },
+  { name: 'James Clear', country: 'USA', bio: 'Writer on habits, decision-making and continuous improvement.' },
+  { name: 'David Goggins', country: 'USA', bio: 'Retired Navy SEAL, ultramarathon runner and author.' },
+  { name: 'Martin Kleppmann', country: 'United Kingdom', bio: 'Researcher in distributed systems and data infrastructure.' },
+  { name: 'Sam Newman', country: 'United Kingdom', bio: 'Consultant and author on microservices and cloud architecture.' },
+  { name: 'Adam Bellemare', country: 'Canada', bio: 'Engineer and author on event-driven architecture.' },
+  { name: 'Dale Carnegie', country: 'USA', bio: 'Writer and lecturer on self-improvement and public speaking.' },
+  { name: 'Todd Herman', country: 'Canada', bio: 'Performance coach and author.' },
+  { name: 'Kobe Bryant', country: 'USA', bio: 'Five-time NBA champion and author.' },
+  { name: 'Robert Greene', country: 'USA', bio: 'Author of books on strategy, power and human nature.' },
+  { name: 'George Leonard', country: 'USA', bio: 'Writer, educator and aikido teacher.' },
+  { name: 'Ryan Holiday', country: 'USA', bio: 'Writer on Stoicism, with no titles in stock yet.' },
 ];
 
 const booksByAuthor = {
-  'Chinua Achebe': [
-    { title: 'Things Fall Apart', genre: 'Fiction', price: 15, publishedYear: 1958 },
-    { title: 'No Longer at Ease', genre: 'Fiction', price: 20, publishedYear: 1960 },
-    { title: 'Arrow of God', genre: 'Fiction', price: 22, publishedYear: 1964 },
-    { title: 'Anthills of the Savannah', genre: 'Fiction', price: 29, publishedYear: 1987 },
+  'James Clear': [{ title: 'Atomic Habits', genre: 'Self-Help', price: 16.99, publishedYear: 2018 }],
+  'David Goggins': [
+    { title: "Can't Hurt Me", genre: 'Memoir', price: 18.5, publishedYear: 2018 },
+    { title: 'Never Finished', genre: 'Memoir', price: 19.99, publishedYear: 2022 },
   ],
-  'Chimamanda Ngozi Adichie': [
-    { title: 'Purple Hibiscus', genre: 'Fiction', price: 18.5, publishedYear: 2003 },
-    { title: 'Half of a Yellow Sun', genre: 'Historical Fiction', price: 24, publishedYear: 2006 },
-    { title: 'Americanah', genre: 'Fiction', price: 26, publishedYear: 2013 },
+  'Martin Kleppmann': [
+    { title: 'Designing Data-Intensive Applications', genre: 'Technology', price: 49.99, publishedYear: 2017 },
   ],
-  "Ngũgĩ wa Thiong'o": [
-    { title: 'Weep Not, Child', genre: 'Fiction', price: 14, publishedYear: 1964 },
-    { title: 'A Grain of Wheat', genre: 'Historical Fiction', price: 19, publishedYear: 1967 },
+  'Sam Newman': [
+    { title: 'Building Microservices', genre: 'Technology', price: 44.99, publishedYear: 2021 },
+    { title: 'Monolith to Microservices', genre: 'Technology', price: 39.99, publishedYear: 2019 },
   ],
-  'Toni Morrison': [
-    { title: 'Beloved', genre: 'Fiction', price: 22, publishedYear: 1987 },
-    { title: 'Home', genre: 'Fiction', price: 17, publishedYear: 2012 },
+  'Adam Bellemare': [
+    { title: 'Building Event-Driven Microservices', genre: 'Technology', price: 54.99, publishedYear: 2020 },
   ],
-  'Marilynne Robinson': [{ title: 'Home', genre: 'Fiction', price: 21, publishedYear: 2008 }],
-  'Gillian Flynn': [
-    { title: 'Sharp Objects', genre: 'Thriller', price: 12, publishedYear: 2006 },
-    { title: 'Gone Girl', genre: 'Thriller', price: 16.5, publishedYear: 2012 },
+  'Dale Carnegie': [
+    { title: 'How to Win Friends and Influence People', genre: 'Self-Help', price: 12.99, publishedYear: 1936 },
   ],
-  'Stieg Larsson': [
-    { title: 'The Girl with the Dragon Tattoo', genre: 'Thriller', price: 19.99, publishedYear: 2005 },
+  'Todd Herman': [{ title: 'The Alter Ego Effect', genre: 'Psychology', price: 17.5, publishedYear: 2019 }],
+  'Kobe Bryant': [{ title: 'The Mamba Mentality', genre: 'Sports', price: 25, publishedYear: 2018 }],
+  'Robert Greene': [
+    { title: 'The 48 Laws of Power', genre: 'Self-Help', price: 18, publishedYear: 1998 },
+    { title: 'The 33 Strategies of War', genre: 'Strategy', price: 22, publishedYear: 2006 },
+    { title: 'Mastery', genre: 'Self-Help', price: 20, publishedYear: 2012 },
+    { title: 'The Laws of Human Nature', genre: 'Psychology', price: 24, publishedYear: 2018 },
   ],
+  'George Leonard': [{ title: 'Mastery', genre: 'Self-Help', price: 14, publishedYear: 1991 }],
 };
 
 const seed = async () => {
